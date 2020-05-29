@@ -1,0 +1,50 @@
+# Wiki: https://wiki.anhcraft.dev/en/battle/addons/battlecoins
+
+group_1:
+  # List of arenas where these rewards available
+  arenas:
+    - dm_assault
+    - dm_italy
+  actions:
+    '0':
+      action: kill_entity
+      coins:
+        # Players will always get 3 coins
+        # factor: none -> always 1
+        # multiplier -> 3
+        # total coins = 1 x 3 = 3
+        '0':
+          factor: none
+          multiplier: 3
+        # They can get bonus too, which is based on how strong were
+        # their enemies (more health = more coins)
+        # total coins = <health> x 0.5
+        # for e.g: with a player (20 health points)
+        # they can get 20 x 0.5 = 10
+        '1':
+          factor: max_health
+          multiplier: 0.5
+
+group_2:
+  arenas:
+    - bw_lighthouse
+  actions:
+    '0':
+      action: break_block
+      # Filter which blocks or entities allowed
+      filter:
+        - bed
+      coins:
+        # total coins = 1 x 50 = 50
+        '0':
+          factor: none
+          multiplier: 50
+    '1':
+      action: kill_entity
+      filter:
+        - ender_dragon
+      coins:
+        # total coins = 1 x 1000 = 1000
+        '0':
+          factor: none
+          multiplier: 1000
