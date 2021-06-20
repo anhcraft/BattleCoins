@@ -1,41 +1,37 @@
 package dev.anhcraft.battlecoins.struct;
 
-import dev.anhcraft.battle.api.inventory.item.Ammo;
-import dev.anhcraft.battle.utils.ConfigurableObject;
-import dev.anhcraft.confighelper.ConfigHelper;
-import dev.anhcraft.confighelper.ConfigSchema;
-import dev.anhcraft.confighelper.annotation.*;
-import dev.anhcraft.confighelper.exception.InvalidValueException;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.YamlConfiguration;
+import dev.anhcraft.config.annotations.Configurable;
+import dev.anhcraft.config.annotations.Path;
+import dev.anhcraft.config.annotations.Setting;
+import dev.anhcraft.config.annotations.Validation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.Map;
 
 @SuppressWarnings("FieldMayBeFinal")
-@Schema
-public class Action extends ConfigurableObject {
+@Configurable
+public class Action {
     public enum Type {
         KILL_ENTITY,
         BREAK_BLOCK,
         PLACE_BLOCK
     }
 
-    @Key("action")
+    @Setting
+    @Path("action")
     @Validation(notNull = true)
-    @PrettyEnum
     private Type actionType;
 
-    @Key("filter")
+    @Setting
     private List<String> filter;
 
-    @Key("coins")
-    @IgnoreValue(ifNull = true)
-    private List<Coins> coins = new ArrayList<>();
+    @Setting
+    @Validation(notNull = true, silent = true)
+    private Map<String, Coins> coins = new HashMap<>();
 
     @NotNull
     public Type getActionType() {
@@ -48,40 +44,7 @@ public class Action extends ConfigurableObject {
     }
 
     @NotNull
-    public List<Coins> getCoins() {
-        return coins;
-    }
-
-    @Override
-    protected @Nullable Object conf2schema(@Nullable Object value, ConfigSchema.Entry entry) {
-        if(value != null && entry.getKey().equals("coins")){
-            ConfigurationSection cs = (ConfigurationSection) value;
-            List<Coins> coins = new ArrayList<>();
-            Set<String> keys = cs.getKeys(false);
-            for(String s : keys){
-                try {
-                    coins.add(ConfigHelper.readConfig(Objects.requireNonNull(cs.getConfigurationSection(s)), ConfigSchema.of(Coins.class)));
-                } catch (InvalidValueException e) {
-                    e.printStackTrace();
-                }
-            }
-            return coins;
-        }
-        return value;
-    }
-
-    @Override
-    protected @Nullable Object schema2conf(@Nullable Object value, ConfigSchema.Entry entry) {
-        if(value != null && entry.getKey().equals("coins")){
-            ConfigurationSection parent = new YamlConfiguration();
-            int i = 0;
-            for(Coins coins : (List<Coins>) value){
-                YamlConfiguration c = new YamlConfiguration();
-                ConfigHelper.writeConfig(c, ConfigSchema.of(Coins.class), coins);
-                parent.set(String.valueOf(i++), c);
-            }
-            return parent;
-        }
-        return value;
+    public Collection<Coins> getCoins() {
+        return coins.values();
     }
 }
